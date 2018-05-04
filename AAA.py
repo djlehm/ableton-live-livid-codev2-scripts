@@ -10,7 +10,7 @@ from _Framework.SessionComponent import SessionComponent
 from _Framework.MixerComponent import MixerComponent
 from _Framework.ChannelStripComponent import ChannelStripComponent
 from _Framework.ModeSelectorComponent import ModeSelectorComponent
-#from _Framework.DeviceComponent import DeviceComponent
+from _Framework.DeviceComponent import DeviceComponent as RawDeviceComponent
 from Axiom_DirectLink.BestBankDeviceComponent import BestBankDeviceComponent as DeviceComponent
 from _Framework.ButtonMatrixElement import ButtonMatrixElement
 
@@ -188,6 +188,16 @@ class MainModeSelector(ModeSelectorComponent):
         self._mixer = SpecialMixerComponent(self._encoder_buttons.width())
         self._session.set_mixer(self._mixer)
         self._device = DeviceComponent()
+        self._customdevice = [
+            RawDeviceComponent(),
+            RawDeviceComponent(),
+            RawDeviceComponent(),
+            RawDeviceComponent(),
+            RawDeviceComponent(),
+            RawDeviceComponent(),
+            RawDeviceComponent(),
+            RawDeviceComponent()
+        ]
         self._control_surface.set_device_component(self._device)
         self._device_nav = DeviceNavComponent()
         self._transport = TransportComponent()
@@ -497,21 +507,46 @@ class MainModeSelector(ModeSelectorComponent):
 
         for index in range(self._encoder_buttons.width()):
 
+            # device_comp.disconnect()
+
             strip = self._mixer.channel_strip(index)
+            track = strip._track
+            device = None
+            Live.Base.log(str(index))
+            if track is not None:
+                if len(track.devices) > 0:
+                    device = track.devices[0]
+                # for d in track.devices:
+                #     Live.Base.log(str(d.parameters))
+                #     Live.Base.log(str(dir(d.parameters)))
 
             if as_active:
 
-                strip.set_send_controls([
-                    self._encoders[index],
-                    self._encoders[index + 8],
-                    None,
-                    None
-                ])
-                strip.set_pan_control(self._encoders[index + 16])
-                strip.set_volume_control(self._encoders[index + 24])
+                if device is not None:
+                    device_comp = self._customdevice[index]
+                    Live.Base.log(str(device))
+                    device_comp.set_lock_to_device(True, device)
+                    device_comp.set_parameter_controls(
+                        tuple([
+                            self._encoders[index],
+                            self._encoders[index + 8],
+                            self._encoders[index + 16],
+                            self._encoders[index + 24]
+                        ])
+                    )
+
+                # strip.set_send_controls([
+                #     self._encoders[index],
+                #     self._encoders[index + 8],
+                #     None,
+                #     None
+                # ])
+                # strip.set_pan_control(self._encoders[index + 16])
+                # strip.set_volume_control(self._encoders[index + 24])
 
             else:
 
-                strip.set_volume_control(None)
-                strip.set_pan_control(None)
-                strip.set_send_controls([None, None, None, None])
+                pass
+                # strip.set_volume_control(None)
+                # strip.set_pan_control(None)
+                # strip.set_send_controls([None, None, None, None])

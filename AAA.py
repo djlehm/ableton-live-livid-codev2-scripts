@@ -512,7 +512,9 @@ class MainModeSelector(ModeSelectorComponent):
             strip = self._mixer.channel_strip(index)
             track = strip._track
             device = None
-            Live.Base.log(str(index))
+            # Live.Base.log(str(index))
+            # Live.Base.log(str(track.name))
+            # Live.Base.log(str(dir(track)))
             if track is not None:
                 if len(track.devices) > 0:
                     device = track.devices[0]
@@ -524,7 +526,7 @@ class MainModeSelector(ModeSelectorComponent):
 
                 if device is not None:
                     device_comp = self._customdevice[index]
-                    Live.Base.log(str(device))
+                    # Live.Base.log(str(device))
                     device_comp.set_lock_to_device(True, device)
                     device_comp.set_parameter_controls(
                         tuple([
@@ -546,7 +548,19 @@ class MainModeSelector(ModeSelectorComponent):
 
             else:
 
-                pass
+                if device is not None:
+                    device_comp = self._customdevice[index]
+                    # Live.Base.log(str(device))
+                    device_comp.set_lock_to_device(False, device)
+                    device_comp.set_parameter_controls(
+                        tuple([
+                            None,
+                            None,
+                            None,
+                            None
+                        ])
+                    )
+
                 # strip.set_volume_control(None)
                 # strip.set_pan_control(None)
                 # strip.set_send_controls([None, None, None, None])
